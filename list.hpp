@@ -405,20 +405,39 @@ public:
     void sort() {
         if (size() < 2) return;
 
-        T *arr = new T[size()];
-        size_t idx = 0;
-        for (node *curr = head; curr != nullptr; curr = curr->next) {
-            arr[idx++] = *(curr->data);
+        // Use merge sort approach - split list, sort halves, then merge
+        // This avoids needing default constructor
+        list sorted = merge_sort(*this);
+        *this = sorted;
+    }
+
+private:
+    static list merge_sort(list &lst) {
+        if (lst.size() < 2) return lst;
+
+        // Split the list into two halves
+        size_t mid = lst.size() / 2;
+        list left, right;
+
+        // Move first half to left
+        for (size_t i = 0; i < mid; ++i) {
+            left.push_back(lst.front());
+            lst.pop_front();
         }
 
-        std::function<bool(const T&, const T&)> cmp = [](const T &a, const T &b) { return a < b; };
-        sjtu::sort(arr, arr + size(), cmp);
-
-        idx = 0;
-        for (node *curr = head; curr != nullptr; curr = curr->next) {
-            *(curr->data) = arr[idx++];
+        // Move second half to right
+        while (!lst.empty()) {
+            right.push_back(lst.front());
+            lst.pop_front();
         }
-        delete[] arr;
+
+        // Recursively sort both halves
+        left = merge_sort(left);
+        right = merge_sort(right);
+
+        // Merge the sorted halves
+        left.merge(right);
+        return left;
     }
     /**
      * merge two sorted lists into one (both in ascending order)
