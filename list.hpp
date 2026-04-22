@@ -439,6 +439,8 @@ private:
         left.merge(right);
         return left;
     }
+
+public:
     /**
      * merge two sorted lists into one (both in ascending order)
      * compare with operator< of T
